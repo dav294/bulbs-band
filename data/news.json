@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "news-1",
+      "title": "New Single Out Now",
+      "category": "release",
+      "date": "2025-01-01",
+      "excerpt": "Our latest single is available on all streaming platforms. Click to listen.",
+      "body": "Our latest single is available on all streaming platforms. We recorded it at Bow Lane Studios in Dublin over the summer. Hope you love it as much as we do.",
+      "coverImage": "",
+      "link": "#",
+      "linkLabel": "Listen Now"
+    }
+  ]
+}

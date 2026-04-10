@@ -1,0 +1,32 @@
+{
+  "bandName": "Bulbs",
+  "tagline": "Indie Rock — Dublin, Ireland",
+  "bio": "Bulbs are an indie rock band from Dublin, Ireland. Add your bio here via the dashboard.",
+  "heroImage": "",
+  "heroHeadline": "New Music Out Now",
+  "heroSubline": "Listen on all platforms",
+  "heroCta1Label": "Listen Now",
+  "heroCta1Link": "#",
+  "heroCta2Label": "Tour Dates",
+  "heroCta2Link": "/shows/",
+  "shopUrl": "#",
+  "latestRelease": {
+    "title": "",
+    "type": "",
+    "date": "",
+    "coverImage": "",
+    "spotifyEmbed": "",
+    "appleMusicLink": "",
+    "bandcampLink": ""
+  },
+  "socials": {
+    "instagram": "",
+    "tiktok": "",
+    "spotify": "",
+    "appleMusic": "",
+    "bandcamp": "",
+    "soundcloud": "",
+    "youtube": "",
+    "facebook": ""
+  }
+}

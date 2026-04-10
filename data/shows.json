@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "id": "show-1",
+      "date": "2025-12-31",
+      "venue": "Venue Name",
+      "city": "Dublin",
+      "country": "Ireland",
+      "status": "upcoming",
+      "supportActs": "",
+      "ticketLink": "#",
+      "soldOut": false,
+      "poster": ""
+    }
+  ]
+}

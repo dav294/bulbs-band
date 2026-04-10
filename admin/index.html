@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Bulbs</title>
+  <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+  <script>window.CMS_MANUAL_INIT = true;</script>
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+  /* ── Multi-image upload widget (same as Sleepover Club) ── */
+  var UPLOAD_TOKEN_KEY = 'sc-upload-token';
+
+  function getCMSToken() {
+    var own = localStorage.getItem(UPLOAD_TOKEN_KEY);
+    if (own) return own;
+    for (var i = 0; i < localStorage.length; i++) {
+      try {
+        var key = localStorage.key(i);
+        var val = JSON.parse(localStorage.getItem(key) || 'null');
+        if (val && typeof val.token === 'string' && val.token.length > 10) return val.token;
+      } catch (e) {}
+    }
+    return null;
+  }
+  function saveUploadToken(t) { localStorage.setItem(UPLOAD_TOKEN_KEY, t.trim()); }
+
+  function uploadFileToGitHub(file, token) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = function (e) {
+        var base64   = e.target.result.split(',')[1];
+        var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
+        var path     = 'assets/images/uploads/' + Date.now() + '-' + safeName;
+        fetch('https://api.github.com/repos/dav294/bulbs-band/contents/' + path, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Upload: ' + file.name, content: base64 }),
+        }).then(function (res) {
+          if (!res.ok) throw new Error('GitHub API ' + res.status);
+          resolve(path);
+        }).catch(reject);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  var MultiImageWidget = createClass({
+    getInitialState: function () {
+      return { uploading: false, progress: [], tokenInput: '', showTokenForm: !getCMSToken() };
+    },
+    getImages: function () {
+      var v = this.props.value;
+      if (!v) return [];
+      if (Array.isArray(v)) return v;
+      if (typeof v.toJS === 'function') return v.toJS();
+      return [];
+    },
+    handleFiles: function (fileList) {
+      var self  = this;
+      var token = getCMSToken();
+      if (!token) { self.setState({ showTokenForm: true }); return; }
+      var files = Array.from(fileList).filter(function (f) { return f.type.startsWith('image/'); });
+      if (!files.length) return;
+      self.setState({ uploading: true, progress: files.map(function (f) { return { name: f.name, status: 'queued' }; }) });
+      var collected = [];
+      function next(i) {
+        if (i >= files.length) {
+          self.props.onChange(self.getImages().concat(collected));
+          self.setState({ uploading: false });
+          setTimeout(function () { self.setState({ progress: [] }); }, 4000);
+          return;
+        }
+        self.setState(function (prev) { var p = prev.progress.slice(); p[i] = { name: files[i].name, status: 'uploading' }; return { progress: p }; });
+        uploadFileToGitHub(files[i], token)
+          .then(function (path) {
+            collected.push(path);
+            self.setState(function (prev) { var p = prev.progress.slice(); p[i] = { name: files[i].name, status: 'done' }; return { progress: p }; });
+            next(i + 1);
+          })
+          .catch(function (err) {
+            self.setState(function (prev) { var p = prev.progress.slice(); p[i] = { name: files[i].name, status: 'error', err: err.message }; return { progress: p }; });
+            next(i + 1);
+          });
+      }
+      next(0);
+    },
+    removeImage: function (i) {
+      this.props.onChange(this.getImages().filter(function (_, j) { return j !== i; }));
+    },
+    saveToken: function () {
+      var t = this.state.tokenInput.trim();
+      if (!t) return;
+      saveUploadToken(t);
+      this.setState({ showTokenForm: false, tokenInput: '' });
+    },
+    render: function () {
+      var self = this; var images = this.getImages(); var id = 'mi-' + this.props.forID;
+      if (this.state.showTokenForm) {
+        return h('div', null,
+          h('div', { style: { border: '1px solid #e0c97a', borderRadius: '8px', padding: '20px 24px', background: '#fffdf0' } },
+            h('p', { style: { margin: '0 0 6px', fontWeight: 700, fontSize: '14px' } }, '🔑 One-time setup: GitHub upload token'),
+            h('p', { style: { margin: '0 0 14px', fontSize: '13px', color: '#666', lineHeight: 1.5 } },
+              'Paste a GitHub Personal Access Token with ', h('strong', null, 'repo'), ' scope. ',
+              h('a', { href: 'https://github.com/settings/tokens/new?scopes=repo&description=Bulbs+image+upload', target: '_blank', style: { color: '#1a6bb5' } }, 'Generate one here ↗'),
+              ' — only needed once.'
+            ),
+            h('div', { style: { display: 'flex', gap: '8px' } },
+              h('input', { type: 'password', placeholder: 'ghp_xxxxxxxxxxxx', value: this.state.tokenInput, style: { flex: 1, padding: '8px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }, onChange: function (e) { self.setState({ tokenInput: e.target.value }); }, onKeyDown: function (e) { if (e.key === 'Enter') self.saveToken(); } }),
+              h('button', { type: 'button', style: { padding: '8px 16px', background: '#1a6bb5', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }, onClick: function () { self.saveToken(); } }, 'Save')
+            )
+          )
+        );
+      }
+      return h('div', { id: this.props.forID },
+        h('label', { htmlFor: id, style: { display: 'block', border: '2px dashed #bbb', borderRadius: '8px', padding: '28px 24px', textAlign: 'center', cursor: this.state.uploading ? 'not-allowed' : 'pointer', background: this.state.uploading ? '#f5f5f5' : '#fafafa', marginBottom: '12px' }, onDragOver: function (e) { e.preventDefault(); }, onDrop: function (e) { e.preventDefault(); if (!self.state.uploading) self.handleFiles(e.dataTransfer.files); } },
+          h('input', { id: id, type: 'file', multiple: true, accept: 'image/*', style: { display: 'none' }, disabled: this.state.uploading, onChange: function (e) { self.handleFiles(e.target.files); } }),
+          this.state.uploading
+            ? h('p', { style: { margin: 0, color: '#555', fontSize: '14px' } }, '⏳ Uploading…')
+            : h('div', null, h('p', { style: { margin: '0 0 4px', fontWeight: 700, fontSize: '14px', color: '#333' } }, '📁 Click to select images'), h('p', { style: { margin: 0, color: '#888', fontSize: '12px' } }, 'Hold Ctrl/Cmd to select multiple · Drag & drop also works'))
+        ),
+        this.state.progress.length > 0 && h('div', { style: { marginBottom: '12px', padding: '8px 14px', background: '#f4f4f4', borderRadius: '6px', fontSize: '13px' } },
+          this.state.progress.map(function (p, i) {
+            var c = p.status === 'done' ? '#2e7d32' : p.status === 'error' ? '#b71c1c' : p.status === 'uploading' ? '#1a6bb5' : '#999';
+            var ic = p.status === 'done' ? '✓' : p.status === 'error' ? '✗' : p.status === 'uploading' ? '⏳' : '·';
+            return h('div', { key: i, style: { padding: '2px 0', color: c } }, ic + ' ' + p.name + (p.err ? ' — ' + p.err : ''));
+          })
+        ),
+        images.length > 0 && h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(88px,1fr))', gap: '8px' } },
+          images.map(function (src, i) {
+            return h('div', { key: src + i, style: { position: 'relative', aspectRatio: '1', borderRadius: '4px', overflow: 'hidden', background: '#ddd' } },
+              h('img', { src: '/' + src, alt: '', style: { width: '100%', height: '100%', objectFit: 'cover' } }),
+              h('button', { type: 'button', style: { position: 'absolute', top: '4px', right: '4px', width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(0,0,0,0.65)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '14px', lineHeight: '22px', textAlign: 'center', padding: 0 }, onClick: function () { self.removeImage(i); } }, '×')
+            );
+          })
+        ),
+        images.length === 0 && this.state.progress.length === 0 && h('p', { style: { color: '#aaa', fontSize: '12px', margin: '4px 0 0' } }, 'No photos added yet.'),
+        h('p', { style: { margin: '8px 0 0', fontSize: '11px', color: '#bbb' } },
+          h('a', { href: '#', style: { color: '#bbb' }, onClick: function (e) { e.preventDefault(); self.setState({ showTokenForm: true, tokenInput: '' }); } }, 'Change upload token')
+        )
+      );
+    },
+  });
+
+  CMS.registerWidget('multi-image', MultiImageWidget);
+
+  /* ── CMS Init ── */
+  CMS.init({
+    config: {
+      backend: {
+        name: 'github',
+        repo: 'dav294/bulbs-band',
+        branch: 'main',
+        base_url: 'https://bulbs-band.vercel.app',
+        auth_endpoint: 'api/auth',
+      },
+      media_folder:  'assets/images/uploads',
+      public_folder: 'assets/images/uploads',
+      site_url:      'https://bulbs-band.vercel.app',
+
+      collections: [
+
+        // ── SETTINGS ────────────────────────────────────────────
+        {
+          name: 'settings', label: 'Site Settings',
+          files: [{
+            name: 'settings', label: 'Band & Site Settings',
+            file: 'data/settings.json',
+            description: 'Bio, social links, hero content, merch store URL.',
+            fields: [
+              { label: 'Band Name',     name: 'bandName',  widget: 'string' },
+              { label: 'Tagline',       name: 'tagline',   widget: 'string', required: false },
+              { label: 'Band Bio',      name: 'bio',       widget: 'text',   hint: 'Shown in footer — 2–3 sentences' },
+              { label: 'Hero Background Image', name: 'heroImage', widget: 'image', required: false },
+              { label: 'Hero Headline', name: 'heroHeadline', widget: 'string', hint: 'e.g. New Single Out Now' },
+              { label: 'Hero Subline',  name: 'heroSubline',  widget: 'string', required: false },
+              { label: 'Hero CTA 1 Label', name: 'heroCta1Label', widget: 'string', default: 'Listen Now' },
+              { label: 'Hero CTA 1 Link',  name: 'heroCta1Link',  widget: 'string', hint: 'e.g. Spotify URL' },
+              { label: 'Hero CTA 2 Label', name: 'heroCta2Label', widget: 'string', default: 'Tour Dates' },
+              { label: 'Hero CTA 2 Link',  name: 'heroCta2Link',  widget: 'string', default: '/shows/' },
+              { label: 'Merch Store URL',  name: 'shopUrl',        widget: 'string', required: false, hint: 'External shop URL (Bandcamp, Shopify, etc.)' },
+              {
+                label: 'Latest Release', name: 'latestRelease', widget: 'object', required: false,
+                fields: [
+                  { label: 'Title',       name: 'title',         widget: 'string', required: false },
+                  { label: 'Type',        name: 'type',          widget: 'select', options: ['Single','EP','Album'], required: false },
+                  { label: 'Date',        name: 'date',          widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD MMMM YYYY', time_format: false, required: false },
+                  { label: 'Cover Art',   name: 'coverImage',    widget: 'image',  required: false },
+                  { label: 'Spotify Embed URL', name: 'spotifyEmbed', widget: 'string', required: false, hint: 'Spotify embed iframe src URL' },
+                  { label: 'Apple Music Link',  name: 'appleMusicLink', widget: 'string', required: false },
+                  { label: 'Bandcamp Link',     name: 'bandcampLink',   widget: 'string', required: false },
+                ],
+              },
+              {
+                label: 'Social & Streaming Links', name: 'socials', widget: 'object',
+                fields: [
+                  { label: 'Instagram',    name: 'instagram',  widget: 'string', required: false },
+                  { label: 'TikTok',       name: 'tiktok',     widget: 'string', required: false },
+                  { label: 'Spotify',      name: 'spotify',    widget: 'string', required: false },
+                  { label: 'Apple Music',  name: 'appleMusic', widget: 'string', required: false },
+                  { label: 'Bandcamp',     name: 'bandcamp',   widget: 'string', required: false },
+                  { label: 'SoundCloud',   name: 'soundcloud', widget: 'string', required: false },
+                  { label: 'YouTube',      name: 'youtube',    widget: 'string', required: false },
+                  { label: 'Facebook',     name: 'facebook',   widget: 'string', required: false },
+                ],
+              },
+            ],
+          }],
+        },
+
+        // ── NEWS ────────────────────────────────────────────────
+        {
+          name: 'news', label: 'News',
+          files: [{
+            name: 'all_news', label: 'All News',
+            file: 'data/news.json',
+            fields: [{
+              label: 'News Items', name: 'items', widget: 'list',
+              summary: '{{fields.title}} — {{fields.date}}',
+              fields: [
+                { label: 'ID',       name: 'id',       widget: 'string', hint: 'Unique slug e.g. new-single-2025' },
+                { label: 'Title',    name: 'title',    widget: 'string' },
+                { label: 'Category', name: 'category', widget: 'select', options: ['release','show','news','video','tour'], default: 'news' },
+                { label: 'Date',     name: 'date',     widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD MMMM YYYY', time_format: false },
+                { label: 'Excerpt (card text)', name: 'excerpt', widget: 'text', hint: '1–2 sentences shown on the news card' },
+                { label: 'Full Body (optional)', name: 'body', widget: 'text', required: false },
+                { label: 'Cover Image', name: 'coverImage', widget: 'image', required: false },
+                { label: 'Link URL',  name: 'link',      widget: 'string', required: false, hint: 'Where to send users when they click (e.g. Spotify, YouTube, ticket link)' },
+                { label: 'Link Label', name: 'linkLabel', widget: 'string', required: false, hint: 'e.g. Listen Now, Watch, Buy Tickets' },
+              ],
+            }],
+          }],
+        },
+
+        // ── SHOWS ───────────────────────────────────────────────
+        {
+          name: 'shows', label: 'Shows',
+          files: [{
+            name: 'all_shows', label: 'All Shows',
+            file: 'data/shows.json',
+            fields: [{
+              label: 'Shows', name: 'items', widget: 'list',
+              summary: '{{fields.venue}} — {{fields.date}}',
+              fields: [
+                { label: 'ID',           name: 'id',          widget: 'string',   hint: 'Unique slug e.g. whelans-dec-2025' },
+                { label: 'Date',         name: 'date',        widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD MMMM YYYY', time_format: false },
+                { label: 'Venue',        name: 'venue',       widget: 'string' },
+                { label: 'City',         name: 'city',        widget: 'string' },
+                { label: 'Country',      name: 'country',     widget: 'string',   default: 'Ireland' },
+                { label: 'Support Acts', name: 'supportActs', widget: 'string',   required: false, hint: 'e.g. The Rye Catchers' },
+                { label: 'Ticket Link',  name: 'ticketLink',  widget: 'string',   required: false },
+                { label: 'Sold Out',     name: 'soldOut',     widget: 'boolean',  default: false },
+                { label: 'Show Poster',  name: 'poster',      widget: 'image',    required: false },
+              ],
+            }],
+          }],
+        },
+
+        // ── MEDIA ───────────────────────────────────────────────
+        {
+          name: 'media', label: 'Media',
+          files: [{
+            name: 'all_media', label: 'Photos & Videos',
+            file: 'data/media.json',
+            fields: [
+              {
+                label: 'Photos',
+                name: 'photos',
+                widget: 'multi-image',
+                required: false,
+                hint: 'Upload all band photos here — shown in the masonry gallery with lightbox',
+              },
+              {
+                label: 'Videos', name: 'videos', widget: 'list', required: false,
+                summary: '{{fields.title}}',
+                fields: [
+                  { label: 'ID',          name: 'id',          widget: 'string' },
+                  { label: 'Title',       name: 'title',       widget: 'string' },
+                  { label: 'Description', name: 'description', widget: 'text',   required: false },
+                  { label: 'Embed URL',   name: 'embedUrl',    widget: 'string', hint: 'YouTube or Vimeo embed src URL', required: false },
+                  { label: 'Cover Image', name: 'coverImage',  widget: 'image',  required: false, hint: 'Shown if no embed URL' },
+                  { label: 'Date',        name: 'date',        widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD MMMM YYYY', time_format: false },
+                ],
+              },
+            ],
+          }],
+        },
+
+        // ── MERCH ───────────────────────────────────────────────
+        {
+          name: 'merch', label: 'Merch',
+          files: [{
+            name: 'all_merch', label: 'All Merch',
+            file: 'data/merch.json',
+            fields: [{
+              label: 'Merch Items', name: 'items', widget: 'list',
+              summary: '{{fields.name}} — €{{fields.price}}',
+              fields: [
+                { label: 'ID',          name: 'id',          widget: 'string' },
+                { label: 'Name',        name: 'name',        widget: 'string' },
+                { label: 'Description', name: 'description', widget: 'text',   required: false },
+                { label: 'Price',       name: 'price',       widget: 'string', hint: 'e.g. 25.00' },
+                { label: 'Currency',    name: 'currency',    widget: 'string', default: 'EUR' },
+                { label: 'Photo',       name: 'image',       widget: 'image',  required: false },
+                { label: 'Buy Link',    name: 'buyLink',     widget: 'string', hint: 'Link to buy this specific item' },
+                { label: 'Category',    name: 'category',    widget: 'select', options: ['clothing','music','accessories','other'], default: 'clothing' },
+                { label: 'Sold Out',    name: 'soldOut',     widget: 'boolean', default: false },
+                { label: 'Featured on Homepage', name: 'featured', widget: 'boolean', default: false, hint: 'Shows in the merch preview section on the homepage' },
+              ],
+            }],
+          }],
+        },
+
+      ],
+    },
+  });
+  </script>
+</body>
+</html>

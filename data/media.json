@@ -1,0 +1,13 @@
+{
+  "photos": [],
+  "videos": [
+    {
+      "id": "video-1",
+      "title": "Video Title",
+      "description": "Video description here.",
+      "embedUrl": "",
+      "coverImage": "",
+      "date": "2025-01-01"
+    }
+  ]
+}

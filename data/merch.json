@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "id": "merch-1",
+      "name": "Merch Item Name",
+      "description": "Description of the item.",
+      "price": "25.00",
+      "currency": "EUR",
+      "image": "",
+      "buyLink": "#",
+      "category": "clothing",
+      "soldOut": false,
+      "featured": true
+    }
+  ]
+}
