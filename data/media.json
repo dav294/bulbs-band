@@ -1,13 +1,10 @@
 {
-  "photos": [],
-  "videos": [
-    {
-      "id": "video-1",
-      "title": "Video Title",
-      "description": "Video description here.",
-      "embedUrl": "",
-      "coverImage": "",
-      "date": "2025-01-01"
-    }
-  ]
+  "photos": [
+    "assets/images/uploads/bulbs-1.jpg",
+    "assets/images/uploads/bulbs-2.jpg",
+    "assets/images/uploads/bulbs-3.webp",
+    "assets/images/uploads/bulbs-4.webp",
+    "assets/images/uploads/bulbs-5.webp"
+  ],
+  "videos": []
 }
