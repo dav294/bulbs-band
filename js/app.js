@@ -308,40 +308,51 @@ function renderShowsList(shows, el, homeMode) {
 }
 
 /* =============================================================
-   MEDIA STRIP (home)
+   MEDIA HOME GALLERY (home)
 ============================================================= */
 function renderMediaStrip() {
-  const track = document.getElementById('media-strip-track');
-  if (!track) return;
+  const gallery = document.getElementById('media-home-gallery');
+  if (!gallery) return;
 
-  const photos = MEDIA.photos || [];
-  if (!photos.length) {
+  const photos = (MEDIA.photos || []).map(src => ({
+    type: 'photo',
+    src: typeof src === 'string' ? src : (src.photo || src.image || ''),
+  }));
+  const videos = (MEDIA.videos || []).map(v => ({
+    type: 'video',
+    src: v.coverImage || '',
+    title: v.title || 'Video',
+  }));
+
+  const allItems = [...photos, ...videos];
+
+  if (!allItems.length) {
     document.getElementById('media-strip-section').style.display = 'none';
     return;
   }
 
-  const items = photos.slice(0, 10);
-  track.innerHTML = items.map((src, i) => {
-    const imgSrc = typeof src === 'string' ? src : (src.photo || src.image || '');
+  gallery.innerHTML = allItems.map((item, i) => {
+    if (item.type === 'photo') {
+      return `
+        <div class="media-home-item" role="button" tabindex="0" aria-label="Bulbs photo ${i + 1}">
+          <img src="${ROOT}${item.src}" alt="Bulbs photo ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}">
+        </div>`;
+    }
+    const inner = item.src
+      ? `<img src="${ROOT}${item.src}" alt="${item.title}" loading="lazy">`
+      : `<div class="media-home-placeholder">▶</div>`;
     return `
-      <div class="media-strip-item">
-        <img src="${ROOT}${imgSrc}" alt="Bulbs photo ${i + 1}" loading="lazy">
+      <div class="media-home-item" onclick="window.location.href='${ROOT}media/'" role="button" tabindex="0" aria-label="${item.title}">
+        ${inner}
+        <div class="media-home-play"><div class="media-home-play-icon">▶</div></div>
       </div>`;
   }).join('');
 
-  // Drag scroll
-  const scroll = track.closest('.media-strip-scroll');
-  let isDown = false, startX, scrollLeft;
-  scroll.addEventListener('mousedown', e => {
-    isDown = true; startX = e.pageX - scroll.offsetLeft; scrollLeft = scroll.scrollLeft;
-  });
-  scroll.addEventListener('mouseleave', () => { isDown = false; });
-  scroll.addEventListener('mouseup',    () => { isDown = false; });
-  scroll.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    scroll.scrollLeft = scrollLeft - (e.pageX - scroll.offsetLeft - startX);
-  });
+  gsap.fromTo(gallery.children,
+    { opacity: 0, scale: 0.97 },
+    { opacity: 1, scale: 1, duration: 0.65, stagger: 0.06, ease: 'power3.out',
+      scrollTrigger: { trigger: gallery, start: 'top 88%', once: true } }
+  );
 }
 
 /* =============================================================

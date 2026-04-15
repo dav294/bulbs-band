@@ -576,39 +576,85 @@ button { cursor: pointer; font-family: inherit; }
 .filter-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
 /* =============================================================
-   MEDIA STRIP (home)
+   MEDIA HOME GALLERY (home page)
 ============================================================= */
-.media-strip-section { padding: 120px 0 0; }
-.media-strip-scroll {
+.media-strip-section { padding: 120px 0; }
+
+.media-home-gallery {
   margin-top: 48px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
-  padding-bottom: 60px;
-}
-.media-strip-scroll:active { cursor: grabbing; }
-.media-strip-track {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 220px;
   gap: 4px;
   padding: 0 48px;
-  width: max-content;
 }
-.media-strip-item {
-  flex-shrink: 0;
-  width: 320px;
-  height: 240px;
+
+.media-home-item {
   overflow: hidden;
   background: var(--bg-2);
   cursor: pointer;
+  position: relative;
 }
-.media-strip-item:first-child { width: 480px; height: 360px; align-self: center; }
-.media-strip-item img {
-  width: 100%; height: 100%;
+.media-home-item:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.media-home-item img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s var(--ease-out);
+  transition: transform 0.6s var(--ease-out);
 }
-.media-strip-item:hover img { transform: scale(1.06); }
+.media-home-item:hover img { transform: scale(1.05); }
+.media-home-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(232,201,122,0);
+  transition: background 0.3s;
+  pointer-events: none;
+}
+.media-home-item:hover::after { background: rgba(232,201,122,0.05); }
+
+.media-home-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,8,8,0.40);
+  pointer-events: none;
+}
+.media-home-play-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(240,236,228,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--text);
+  transition: all 0.25s var(--ease-out);
+}
+.media-home-item:hover .media-home-play-icon {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  transform: scale(1.12);
+}
+.media-home-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-disp);
+  font-size: 2rem;
+  color: var(--text-dim);
+}
 
 /* =============================================================
    MERCH CTA (home)
@@ -973,6 +1019,7 @@ button { cursor: pointer; font-family: inherit; }
   .merch-cta-grid { grid-template-columns: repeat(4, 1fr); }
   .photo-masonry { columns: 3; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .media-home-gallery { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 190px; }
 }
 
 @media (max-width: 768px) {
@@ -996,9 +1043,7 @@ button { cursor: pointer; font-family: inherit; }
   .show-row { grid-template-columns: 80px 1fr auto; gap: 16px; }
   .show-city { display: none; }
 
-  .media-strip-track { padding: 0 24px; }
-  .media-strip-item { width: 240px; height: 180px; }
-  .media-strip-item:first-child { width: 300px; height: 225px; }
+  .media-home-gallery { padding: 0 24px; grid-auto-rows: 160px; }
 
   .merch-grid { grid-template-columns: repeat(2, 1fr); }
   .merch-cta-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1022,4 +1067,5 @@ button { cursor: pointer; font-family: inherit; }
   .photo-masonry { columns: 1; }
   .show-row { grid-template-columns: 72px 1fr; }
   .show-actions .btn { display: none; }
+  .media-home-gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 130px; }
 }
