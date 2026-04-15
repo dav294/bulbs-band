@@ -1,7 +1,7 @@
 /* =============================================================
    Bulbs — Main Stylesheet
    Stack: Barlow Condensed (display) + DM Sans (body)
-   Palette: #080808 bg / #f0ece4 text / #e8c97a accent (amber)
+   Palette: #080808 bg / #f0ece4 text / #f8ac19 accent (brand orange-amber)
 ============================================================= */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,9 +13,9 @@
   --text:         #f0ece4;
   --text-muted:   rgba(240,236,228,0.50);
   --text-dim:     rgba(240,236,228,0.18);
-  --accent:       #e8c97a;
-  --accent-deep:  #c9a94e;
-  --accent-dim:   rgba(232,201,122,0.10);
+  --accent:       #f8ac19;
+  --accent-deep:  #d9920e;
+  --accent-dim:   rgba(248,172,25,0.10);
   --border:       rgba(240,236,228,0.08);
   --border-hover: rgba(240,236,228,0.20);
   --font-disp:    'Barlow Condensed', sans-serif;
@@ -611,11 +611,11 @@ button { cursor: pointer; font-family: inherit; }
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(232,201,122,0);
+  background: rgba(248,172,25,0);
   transition: background 0.3s;
   pointer-events: none;
 }
-.media-home-item:hover::after { background: rgba(232,201,122,0.05); }
+.media-home-item:hover::after { background: rgba(248,172,25,0.05); }
 
 .media-home-play {
   position: absolute;
@@ -807,10 +807,10 @@ button { cursor: pointer; font-family: inherit; }
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(232,201,122,0);
+  background: rgba(248,172,25,0);
   transition: background 0.3s;
 }
-.photo-masonry-item:hover::after { background: rgba(232,201,122,0.06); }
+.photo-masonry-item:hover::after { background: rgba(248,172,25,0.06); }
 
 /* Lightbox */
 .lightbox {
