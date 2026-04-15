@@ -3,18 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bulbs | Indie Rock — Dublin</title>
-  <meta name="description" content="Bulbs are an indie rock band from Dublin, Ireland. News, tour dates, music and merch.">
+
+  <!-- Primary SEO -->
+  <title>Bulbs | Indie Rock Band Dublin Ireland</title>
+  <meta name="description" content="Bulbs are Dublin's emerging indie rock band. Live shows across Ireland, original music, news and merch. One of Ireland's most exciting new acts.">
+  <meta name="keywords" content="Bulbs band Dublin, indie rock Dublin, Irish indie band, live music Dublin, Dublin band, emerging Irish bands, indie rock Ireland, alternative rock Dublin, new Irish music, Dublin concerts, indie music Ireland, Dublin indie rock">
+  <meta name="author" content="Bulbs">
   <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#080808">
+
+  <!-- Canonical + hreflang -->
   <link rel="canonical" href="https://bulbs-band.vercel.app/">
-  <meta property="og:type"        content="website">
-  <meta property="og:title"       content="Bulbs | Indie Rock — Dublin">
-  <meta property="og:description" content="Bulbs are an indie rock band from Dublin, Ireland.">
-  <meta property="og:image"       content="https://bulbs-band.vercel.app/assets/images/og.jpg">
-  <meta name="twitter:card"       content="summary_large_image">
-  <meta name="theme-color"        content="#080808">
+  <link rel="alternate" hreflang="en-IE" href="https://bulbs-band.vercel.app/">
+  <link rel="alternate" hreflang="en-GB" href="https://bulbs-band.vercel.app/">
+  <link rel="alternate" hreflang="x-default" href="https://bulbs-band.vercel.app/">
+
+  <!-- Geo targeting — Dublin -->
+  <meta name="geo.region" content="IE-D">
+  <meta name="geo.placename" content="Dublin, Ireland">
+  <meta name="geo.position" content="53.3498;-6.2603">
+  <meta name="ICBM" content="53.3498, -6.2603">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="music.musician">
+  <meta property="og:locale" content="en_IE">
+  <meta property="og:site_name" content="Bulbs">
+  <meta property="og:title" content="Bulbs | Indie Rock Band Dublin Ireland">
+  <meta property="og:description" content="Bulbs are Dublin's emerging indie rock band. Live shows, original music, news and merch from one of Ireland's most exciting new acts.">
+  <meta property="og:url" content="https://bulbs-band.vercel.app/">
+  <meta property="og:image" content="https://bulbs-band.vercel.app/assets/images/uploads/bulbs-1.jpg">
+  <meta property="og:image:alt" content="Bulbs — Indie Rock Band, Dublin Ireland">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bulbs | Indie Rock Band Dublin Ireland">
+  <meta name="twitter:description" content="Bulbs are Dublin's emerging indie rock band. Live shows, original music, news and merch from one of Ireland's most exciting new acts.">
+  <meta name="twitter:image" content="https://bulbs-band.vercel.app/assets/images/uploads/bulbs-1.jpg">
+  <meta name="twitter:image:alt" content="Bulbs — Indie Rock Band, Dublin Ireland">
+
+  <!-- JSON-LD: MusicGroup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "Bulbs",
+    "alternateName": ["Bulbs Band", "Bulbs Dublin", "Bulbs Irish Band"],
+    "description": "Bulbs are an indie rock band from Dublin, Ireland, known for high-energy live shows and original music. One of Ireland's most exciting emerging acts.",
+    "genre": ["Indie Rock", "Alternative Rock", "Irish Indie", "Indie Pop"],
+    "foundingLocation": {
+      "@type": "Place",
+      "name": "Dublin, Ireland",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Dublin",
+        "addressCountry": "IE"
+      }
+    },
+    "url": "https://bulbs-band.vercel.app",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://bulbs-band.vercel.app/assets/images/uploads/bulbs-1.jpg",
+      "description": "Bulbs — Indie Rock Band, Dublin Ireland"
+    },
+    "subjectOf": {
+      "@type": "WebSite",
+      "url": "https://bulbs-band.vercel.app",
+      "name": "Bulbs Official Website"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- JSON-LD: WebSite (enables sitelinks search box eligibility) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Bulbs",
+    "url": "https://bulbs-band.vercel.app",
+    "description": "Official website of Bulbs, Dublin indie rock band.",
+    "inLanguage": "en-IE",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://bulbs-band.vercel.app/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/logos/favicon.png">
-  <link rel="apple-touch-icon" sizes="180x180"    href="assets/logos/logo-180.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logos/logo-180.png">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -34,7 +120,7 @@
   <nav class="site-nav" id="site-nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo" id="nav-logo">
-        <img src="assets/images/uploads/bulbs.band-logo.jpg" alt="Bulbs" class="nav-logo-img">
+        <img src="assets/images/uploads/bulbs.band-logo.jpg" alt="Bulbs — Indie Rock Band Dublin" class="nav-logo-img">
       </a>
       <ul class="nav-links">
         <li><a href="shows/">Shows</a></li>
